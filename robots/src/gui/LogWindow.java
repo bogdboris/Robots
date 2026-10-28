@@ -15,12 +15,14 @@ public class LogWindow extends JInternalFrame implements LogChangeListener
 {
     private LogWindowSource m_logSource;
     private TextArea m_logContent;
+    private volatile boolean m_subscribed;
 
     public LogWindow(LogWindowSource logSource) 
     {
         super("Протокол работы", true, true, true, true);
         m_logSource = logSource;
         m_logSource.registerListener(this);
+        m_subscribed = true;
         m_logContent = new TextArea("");
         m_logContent.setSize(200, 500);
         
@@ -46,5 +48,16 @@ public class LogWindow extends JInternalFrame implements LogChangeListener
     public void onLogChanged()
     {
         EventQueue.invokeLater(this::updateLogContent);
+    }
+
+    @Override
+    public void dispose()
+    {
+        if (m_subscribed)
+        {
+            m_logSource.unregisterListener(this);
+            m_subscribed = false;
+        }
+        super.dispose();
     }
 }
