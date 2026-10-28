@@ -13,15 +13,24 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import model.RobotModel;
+
+
+//вынести создание модели
 public class GameVisualizer extends JPanel
 {
     private final RobotModel m_model;
-    private final GameController m_controller;
+    private GameController m_controller;
 
-    public GameVisualizer() 
+    public GameVisualizer(RobotModel model)
     {
-        m_model = new RobotModel();
-        m_controller = new GameController(m_model, this::onRedrawEvent, this::getWidth, this::getHeight);
+        m_model = model;
+        setDoubleBuffered(true);
+    }
+
+    public void bindController(GameController controller)
+    {
+        m_controller = controller;
         addMouseListener(new MouseAdapter()
         {
             @Override
@@ -45,7 +54,6 @@ public class GameVisualizer extends JPanel
                 m_controller.setTargetPosition(e.getPoint());
             }
         });
-        setDoubleBuffered(true);
     }
     
     protected void onRedrawEvent()
@@ -121,19 +129,4 @@ public class GameVisualizer extends JPanel
         }
     }
 
-    public void setPaused(boolean paused)
-    {
-        m_controller.setPaused(paused);
-    }
-
-    public void clearTrail()
-    {
-        m_controller.clearTrail();
-        repaint();
-    }
-
-    public void setSpeedMultiplier(double speedMultiplier)
-    {
-        m_controller.setSpeedMultiplier(speedMultiplier);
-    }
 }

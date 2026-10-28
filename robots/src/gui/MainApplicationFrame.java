@@ -28,12 +28,13 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import log.Logger;
+import model.RobotModel;
 
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final Map<String, JInternalFrame> windows = new HashMap<>();
 
-    public MainApplicationFrame() {
+    public MainApplicationFrame(RobotModel robotModel) {
         // Установка размеров и положения главного окна
         int inset = 50;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -47,9 +48,14 @@ public class MainApplicationFrame extends JFrame {
         LogWindow logWindow = createLogWindow();
         addWindow(logWindow);
 
-        GameWindow gameWindow = new GameWindow();
+        GameWindow gameWindow = new GameWindow(robotModel);
         gameWindow.setSize(400, 400);
         addWindow(gameWindow);
+
+        RobotCoordinatesWindow coordinatesWindow = new RobotCoordinatesWindow(robotModel);
+        coordinatesWindow.setLocation(420, 10);
+        coordinatesWindow.setSize(280, 160);
+        addWindow(coordinatesWindow);
 
 
         setJMenuBar(generateMenuBar());

@@ -9,15 +9,20 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.border.EmptyBorder;
 
+import model.RobotModel;
+
 public class GameWindow extends JInternalFrame
 {
     private final GameVisualizer m_visualizer;
+    private final GameController m_controller;
     private final JButton m_pauseButton;
 
-    public GameWindow() 
+    public GameWindow(RobotModel model)
     {
         super("Игровое поле", true, true, true, true);
-        m_visualizer = new GameVisualizer();
+        m_visualizer = new GameVisualizer(model);
+        m_controller = new GameController(model, m_visualizer::onRedrawEvent, m_visualizer::getWidth, m_visualizer::getHeight);
+        m_visualizer.bindController(m_controller);
 
         JPanel controlsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         controlsPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -26,11 +31,14 @@ public class GameWindow extends JInternalFrame
         m_pauseButton.addActionListener((e) -> togglePause());
 
         JButton clearTrailButton = new JButton("Очистить след");
-        clearTrailButton.addActionListener((e) -> m_visualizer.clearTrail());
+        clearTrailButton.addActionListener((e) -> {
+            m_controller.clearTrail();
+            m_visualizer.repaint();
+        });
 
         JSlider speedSlider = new JSlider(20, 200, 100);
         speedSlider.setToolTipText("Скорость робота (%)");
-        speedSlider.addChangeListener((e) -> m_visualizer.setSpeedMultiplier(speedSlider.getValue() / 100.0));
+        speedSlider.addChangeListener((e) -> m_controller.setSpeedMultiplier(speedSlider.getValue() / 100.0));
 
         controlsPanel.add(m_pauseButton);
         controlsPanel.add(clearTrailButton);
@@ -46,7 +54,7 @@ public class GameWindow extends JInternalFrame
     private void togglePause()
     {
         boolean pause = "Пауза".equals(m_pauseButton.getText());
-        m_visualizer.setPaused(pause);
+        m_controller.setPaused(pause);
         m_pauseButton.setText(pause ? "Продолжить" : "Пауза");
     }
 }
